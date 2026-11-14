@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Learning Animation-Aware 3D Gaussians with Native Rigging. Anonymous research project: synchronized motion comparisons and rendering evaluation on 600 characters.">
+  <title>Learning Animation-Aware 3D Gaussians with Native Rigging</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script src="data.js" defer></script>
+  <script src="video-runtime.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="dataset-player.js" defer></script>
+  <link rel="stylesheet" href="hero-player.css">
+  <script src="hero-player.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#comparisons">Skip to comparisons</a>
+  <header class="site-header">
+    <a class="wordmark" href="#overview" aria-label="Project overview"><span class="mark" aria-hidden="true">✳</span> Animation-aware Gaussians</a>
+    <nav aria-label="Main navigation"><a href="#dataset">Dataset</a><a href="#comparisons">Comparisons</a><a href="#results">Results</a></nav>
+  </header>
+  <main>
+    <section class="hero wrap" id="overview">
+      <p class="eyebrow">3D GAUSSIANS · RIGGING FOR ANIMATION</p>
+      <h1>Learning Animation-Aware<br class="desktop-break"> 3D Gaussians with<br><em>Native Rigging</em></h1>
+      <p class="authors">Anonymous Authors</p>
+      <div class="hero-actions"><a class="button primary" href="#comparisons">Explore video comparisons <span aria-hidden="true">↗</span></a><a class="button secondary" href="#results">View quantitative results</a></div>
+      <div class="hero-showcase">
+        <div class="hero-mode-controls" role="group" aria-label="Hero representation"><button type="button" data-hero-mode="0" class="active" aria-pressed="true">Appearance</button><button type="button" data-hero-mode="1" aria-pressed="false">Skinning + skeleton</button></div>
+        <canvas id="hero-canvas" width="1280" height="334" aria-label="Rendered appearance: four animated characters"></canvas>
+        <img id="hero-fallback" src="assets/hero-poster.jpg" width="1280" height="334" alt="Four Ours* animated characters">
+        <video id="hero-video" muted loop playsinline preload="none" poster="assets/hero-poster.jpg" aria-label="Ours star animation examples: gold-black mechanical crab, boy, long-ear character in yellow overalls, and quadruped bear"><source src="assets/hero-modes-atlas.mp4" type="video/mp4"></video>
+        <div class="hero-caption"><span><span class="blue-dot"></span> Generated Gaussians in motion <b>Ours*</b></span><button class="quiet-button" id="hero-toggle" type="button" aria-label="Pause showcase">Pause animation</button></div>
+      </div>
+    </section>
+
+    <section class="section wrap dataset-section" id="dataset">
+      <div class="section-heading"><div><p class="eyebrow">01 / Dataset</p><h2>3D Gaussian<br><em>Rigging.</em></h2></div><p>Humanoids, animals, articulated creatures, plants and others.</p></div>
+      <div class="dataset-video-card" id="dataset-player"><div class="dataset-video-heading"></div>
+        <div class="dataset-modes" role="group" aria-label="Dataset representation"><button type="button" data-dataset-mode="0" class="active" aria-pressed="true">Rendered appearance</button><button type="button" data-dataset-mode="1" aria-pressed="false">Gaussian ellipsoids</button><button type="button" data-dataset-mode="2" aria-pressed="false">Skinning ellipsoids</button><button type="button" data-dataset-mode="3" aria-pressed="false">Skeletons</button></div>
+        <canvas id="dataset-canvas" width="1536" height="768" aria-label="32 unique rotating dataset objects in rendered appearance mode"></canvas>
+        <video id="dataset-video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"><source src="assets/dataset/dataset-turntable-atlas.mp4" type="video/mp4"></video>
+        <div class="dataset-playback"><button id="dataset-play" type="button">Pause rotation</button><span id="dataset-angle">0°</span><span class="dataset-sync-note">Switch views without changing the rotation.</span><button id="dataset-fullscreen" type="button">Full screen</button></div><p id="dataset-status" class="player-status" role="status"></p>
+      </div>
+    </section>
+
+    <section class="section wrap" id="comparisons">
+      <div class="section-heading"><div><p class="eyebrow">02 / MOTION COMPARISONS</p><h2>See the difference<br><em>in motion.</em></h2></div><p>One pose and camera sequence, shared by every method. Choose a character, compare two methods, or inspect all methods together.</p></div>
+      <div id="case-list" class="case-list" role="group" aria-label="Choose a character"></div>
+      <div class="comparison-shell" id="comparison-shell" data-mode="pair">
+        <div class="comparison-top"><div><span class="case-category" id="case-category"></span><h3 id="case-title"></h3></div><div class="segmented" role="group" aria-label="Comparison layout"><button type="button" id="mode-pair" class="active" aria-pressed="true">Side by side</button><button type="button" id="mode-all" aria-pressed="false">All methods</button></div></div>
+        <div class="pair-selectors" id="pair-selectors"><label>Left method<select id="left-method" aria-label="Left method"></select></label><span class="versus" aria-hidden="true">vs.</span><label>Right method<select id="right-method" aria-label="Right method"></select></label></div>
+        <div class="pair-view" id="pair-view"><figure><canvas id="left-canvas" width="460" height="480" aria-label="Left method synchronized video frame"></canvas><figcaption id="left-caption"></figcaption></figure><figure><canvas id="right-canvas" width="460" height="480" aria-label="Right method synchronized video frame"></canvas><figcaption id="right-caption"></figcaption></figure></div>
+        <video id="comparison-video" class="atlas-video" muted loop playsinline preload="metadata" aria-label="Synchronized comparison of all methods"></video>
+        <div class="playback"><button type="button" id="play-toggle" class="play-button" aria-label="Play comparison">Play</button><button type="button" id="frame-back" class="step-button" aria-label="Previous frame">−1</button><input type="range" id="timeline" min="0" max="1" step="1" value="0" aria-label="Pose frame"><button type="button" id="frame-next" class="step-button" aria-label="Next frame">+1</button><output id="frame-label">Frame 0</output><label class="speed-label">Speed<select id="speed" aria-label="Playback speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label></div>
+        <p id="player-status" class="player-status" role="status" aria-live="polite"></p>
+        <div class="comparison-footer"><span id="sequence-info"></span><a id="video-download" href="#" download>Download comparison video ↓</a></div>
+      </div>
+      <p class="fine-print">Videos show full selected sequences. Each clip uses a shared crop across all methods and all frames. The sequence averages above are measured on the original full-resolution renders; video compression and display crops do not affect the reported metrics.</p>
+      <details class="source-details"><summary>Scene ID and video playback information</summary><p id="scene-info"></p><p>Clips are displayed at 24 fps, or 12 / 6 fps for short sequences. This is a presentation speed, not a claim about the source motion capture rate. The ground-truth image and every prediction at a given frame share the same camera and pose.</p></details>
+    </section>
+
+    <section class="results-section" id="results"><div class="wrap section">
+      <div class="section-heading"><div><p class="eyebrow">03 / QUANTITATIVE EVALUATION</p><h2>A common test set.<br><em>A complete comparison.</em></h2></div><p>All six methods are evaluated on the same 600 characters and 52,246 frames.</p></div>
+      <div class="result-callout"><div><span>Ours* vs. Ours</span><strong>+0.82 <small>dB PSNR</small></strong></div><p>Generated Gaussians improve the overall rendering scores under the same predicted-skinning evaluation protocol.</p></div>
+      <div class="table-scroll"><table><caption>Input-pose rendering · 600 characters · full-frame, frame-weighted averages</caption><thead><tr><th scope="col">Method</th><th scope="col">PSNR <span>↑</span></th><th scope="col">SSIM <span>↑</span></th><th scope="col">LPIPS <span>↓</span></th></tr></thead><tbody id="metrics-body"></tbody></table></div>
+      <div class="method-notes"><p><b>Ours</b><br>Input 3D Gaussians with Ours predicted skinning.</p><p><b>Ours*</b><br>Animation-aware 3D Gaussians with Ours predicted skinning.</p></div>
+      <p class="protocol">All frames are weighted equally. Evaluations use matching input poses and cameras, a white background, and AlexNet LPIPS. Ours and Ours* use predicted skinning. These values are deformation-rendering results, not static six-view results.</p>
+    </div></section>
+  </main>
+  <footer class="wrap"><span>Learning Animation-Aware 3D Gaussians with Native Rigging</span><span>Anonymous Authors</span></footer>
+  <noscript><p class="noscript">Enable JavaScript for synchronized comparisons and the interactive results table. The <a href="assets/data/comparison_600.csv">results CSV</a> is available without JavaScript.</p></noscript>
+</body>
+</html>
