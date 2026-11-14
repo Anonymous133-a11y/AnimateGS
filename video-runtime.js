@@ -3,6 +3,7 @@
 window.createProjectPlayer = function(video, surface, options) {
   let wanted = !!options.autoplay, visible = !('IntersectionObserver' in window);
   let ready = true, pending = null, lastFrame = -1, generation = 0;
+  let primed = false;
   const nativeFrames = typeof video.requestVideoFrameCallback === 'function';
   const active = () => wanted && visible && !document.hidden && ready;
   function stopFrames() {
@@ -30,8 +31,19 @@ window.createProjectPlayer = function(video, surface, options) {
   }
   function update() {
     const token = ++generation;
+    if (!active() && options.onBuffer) options.onBuffer(false);
     if (options.onIntent) options.onIntent(wanted);
+    if (wanted && visible && !document.hidden) video.preload = 'auto';
     if (!active()) { video.pause(); stopFrames(); return; }
+    // Buffer before the first playback of each source, instead of starting at
+    // loadeddata and repeatedly stopping on a slow anonymous media proxy.
+    if (!primed && video.readyState < 4) {
+      video.pause(); stopFrames();
+      if (options.onBuffer) options.onBuffer(true);
+      return;
+    }
+    primed = true;
+    if (options.onBuffer) options.onBuffer(false);
     video.play().then(() => {
       if (token !== generation) return;
       if (!active()) { video.pause(); return; }
@@ -45,7 +57,11 @@ window.createProjectPlayer = function(video, surface, options) {
   }
   video.addEventListener('play', schedule);
   video.addEventListener('pause', stopFrames);
-  video.addEventListener('emptied', () => { lastFrame = -1; stopFrames(); });
+  video.addEventListener('emptied', () => { primed = false; lastFrame = -1; stopFrames(); });
+  video.addEventListener('canplaythrough', () => { if (!primed) update(); });
+  video.addEventListener('progress', () => { if (!primed && video.readyState >= 4) update(); });
+  video.addEventListener('waiting', () => { if (active() && options.onBuffer) options.onBuffer(true); });
+  video.addEventListener('playing', () => { if (options.onBuffer) options.onBuffer(false); });
   document.addEventListener('visibilitychange', update);
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(entries => {

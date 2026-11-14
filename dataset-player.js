@@ -11,12 +11,15 @@
     const source=video.readyState>=2?video:(posterReady?poster:null);
     if(!source)return;
     const w=canvas.width,h=canvas.height;
-    ctx.drawImage(source,(mode%2)*w,Math.floor(mode/2)*h,w,h,0,0,w,h);
+    const sw=(source.videoWidth||source.naturalWidth)/2,sh=(source.videoHeight||source.naturalHeight)/2;
+    if(!sw||!sh)return;
+    ctx.drawImage(source,(mode%2)*sw,Math.floor(mode/2)*sh,sw,sh,0,0,w,h);
     $('dataset-angle').textContent=`${Math.floor((video.currentTime%6)*60)}°`;
   }
   const player=createProjectPlayer(video,shell,{
     autoplay:!matchMedia('(prefers-reduced-motion: reduce)').matches,
     fps:20,draw,
+    onBuffer:waiting=>{$('dataset-status').textContent=waiting?'Buffering rotation… Playback will start automatically.':'';},
     onIntent:playing=>{$('dataset-play').textContent=playing?'Pause rotation':'Play rotation';},
     onError:()=>{$('dataset-status').textContent='Press Play rotation to start.';}
   });
@@ -31,7 +34,7 @@
     if(document.fullscreenElement){document.exitFullscreen();}
     else if(shell.requestFullscreen){shell.requestFullscreen().catch(()=>{$('dataset-status').textContent='Full screen is unavailable in this browser.';});}
   });
-  video.addEventListener('loadeddata',()=>{draw();$('dataset-status').textContent='';});
+  video.addEventListener('loadeddata',()=>{draw();if(video.readyState>=4)$('dataset-status').textContent='';});
   video.addEventListener('playing',()=>{$('dataset-status').textContent='';});
   video.addEventListener('seeked',draw);
   video.addEventListener('error',()=>{$('dataset-status').textContent='Video could not load. Keep the assets folder beside index.html.';});

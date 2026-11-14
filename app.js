@@ -50,6 +50,7 @@
   const player = createProjectPlayer(video, $('comparison-shell'), {
     autoplay: false, fps: () => current.fps,
     draw: () => { if (!switching) { draw(); updateProgress(); } },
+    onBuffer:waiting=>{$('player-status').textContent=waiting?'Buffering sequence… Playback will start automatically.':'';},
     onError: () => { $('player-status').textContent='Playback did not start. Try Play again.'; updateProgress(); }
   });
   function seek(frame) {

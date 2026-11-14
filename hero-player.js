@@ -22,6 +22,7 @@
   const player=createProjectPlayer(video,canvas.parentElement,{
     autoplay:!matchMedia('(prefers-reduced-motion: reduce)').matches,
     fps:24,draw,
+    onBuffer:waiting=>{toggle.textContent=waiting?'Buffering… (click to pause)':'Pause animation';},
     onIntent:playing=>{
       toggle.textContent=playing?'Pause animation':'Play animation';
       toggle.setAttribute('aria-label',playing?'Pause showcase':'Play showcase');
